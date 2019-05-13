@@ -1,0 +1,9 @@
+just : ~A -> Maybe ~A
+null : Maybe ~A
+
+bob : Human
+rob : Human
+
+fromJust (just bob) ~h?
+fromJust null ~h?
+fromNull null?

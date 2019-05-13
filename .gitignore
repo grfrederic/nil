@@ -1,0 +1,7 @@
+# private data
+private/
+
+# (semi) compiled stuff
+dist/
+*.o
+*.hi

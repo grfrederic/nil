@@ -1,0 +1,12 @@
+cons : ~A (List ~A) -> List ~A  -- list of ~A's
+nil : List                      -- empty list
+
+head ? ~A (List ~A)
+head ~a (cons ~a ~t)
+
+append ? List List List
+append nil ~y ~y
+append (cons ~h ~x) ~y (cons ~h ~z) <- append ~x ~y ~z 
+
+a : A
+head a ~l?

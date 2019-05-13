@@ -1,0 +1,8 @@
+z : P
+s : P -> P
+
+add ? P P P
+add z ~y ~y
+add (s ~x) ~y (s ~z) <- add ~x ~y ~z
+
+add ~x ~y (s (s z))?

@@ -1,0 +1,40 @@
+-- peano arithmetic
+z : P
+s : P -> P
+
+greater ? P P
+greater (s ~x) z
+greater (s ~x) (s ~y) <- greater ~x ~y
+
+notsmaller ? P P
+notsmaller ~x z
+notsmaller (s ~x) (s ~y) <- notsmaller ~x ~y
+
+
+-- declaration of generic list
+cons : ~A (List ~A) -> List ~A
+nil : List ~A
+
+
+-- partitions list into smaller and greater than first arg
+partition ? P (List P) (List P) (List P)
+partition ~x nil nil nil
+partition ~x (cons ~h ~t) ~l1 (cons ~h ~l2) <- greater ~h ~x,
+                                               partition ~x ~t ~l1 ~l2
+partition ~x (cons ~h ~t) (cons ~h ~l1) ~l2 <- notsmaller ~x ~h,
+                                               partition ~x ~t ~l1 ~l2
+
+
+-- helper for qsort
+qsortAux ? (List P) (List P) (List P)
+qsortAux nil ~a ~a
+qsortAux (cons ~h ~t) ~a ~s <- partition ~h ~t ~l1 ~l2,
+                               qsortAux ~l1 ~a ~s1,
+                               qsortAux ~l2 (cons ~h ~s1) ~s
+
+qsort ? (List P) (List P)
+qsort ~l ~s <- qsortAux ~l nil ~s
+
+
+-- sort 1 0 2 (descending!)
+qsort (cons (s z) (cons z (cons (s (s z)) nil))) ~sorted?

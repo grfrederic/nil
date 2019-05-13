@@ -1,0 +1,9 @@
+cons : ~A (List ~A) -> List ~A
+nil : List ~A
+
+head ? ~A (List ~A)
+head ~a ~l <- fromCons ~l ~a ~t
+
+a : T
+b : T
+<- head ~a (cons a (cons b nil))

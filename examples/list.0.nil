@@ -1,0 +1,11 @@
+cons : ~A (List ~A) -> List ~A
+nil : List ~A
+
+iter ? (List ~A) ~A
+iter (cons ~h ~t) ~h
+iter (cons ~h ~t) ~a <- iter ~t ~a
+
+rob : Human
+bob : Human
+
+<- iter (cons rob (cons bob (cons rob nil))) ~h

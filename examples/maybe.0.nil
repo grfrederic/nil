@@ -1,0 +1,11 @@
+just : ~A -> Maybe ~A
+null : Maybe ~A
+
+extract ? (Maybe ~A) ~A
+extract (just ~a) ~a
+
+bob : Human
+rob : Human
+
+<- extract (just bob) ~h
+<- extract null ~h

@@ -1,0 +1,7 @@
+i ? ~A ~A
+i ~a ~a
+
+a : A
+b : B
+
+<- i a b

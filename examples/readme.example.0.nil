@@ -1,0 +1,10 @@
+succ : Peano -> Peano  -- constructor
+zero : Peano           -- constant
+
+-- predicate, add ~x ~y ~z checks if ~x + ~y = ~z
+add ? Peano Peano Peano
+add zero ~x ~x
+add (succ ~x) ~y (succ ~z) <- add ~x ~y ~z
+
+-- get solutions to 1 + ~x = 3
+add (succ zero) ~x (succ (succ (succ zero)))?

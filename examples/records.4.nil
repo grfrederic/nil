@@ -1,0 +1,12 @@
+book : {id: P, author: A} -> Book
+
+z : P
+s : P -> P
+
+a0 : A
+a1 : A
+a2 : A
+
+
+getId (book {id: s z, author: a1}) ~i?
+getAuthor (book {id: s z, author: a1}) ~a?

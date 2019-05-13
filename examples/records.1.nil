@@ -1,0 +1,13 @@
+book : {id: P, author: A} -> Book
+
+z : P
+s : P -> P
+
+a0 : A
+a1 : A
+a2 : A
+
+goodBook ? Book
+goodBook (book {id: z, author: a0})
+
+goodBook (book {id: z, author: ~a})?

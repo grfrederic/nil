@@ -1,0 +1,6 @@
+cons : ~A (List ~A) -> List ~A
+a : A
+b : B
+
+comp ? (List ~A) (List ~A)
+<- comp (cons a ~t1) (cons b ~t2)
