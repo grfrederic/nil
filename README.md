@@ -7,6 +7,13 @@ it's main inspiration is the Gödel programming language
 nil also has a syntax highlighting plugin for vim, [nil.vim](https://github.com/grfrederic/nil.vim)
 
 
+### install
+clone the project and install using cabal:
+```
+cabal install
+```
+
+
 ### examples
 
 #### program 1, addition
