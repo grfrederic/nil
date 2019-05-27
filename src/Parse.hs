@@ -13,14 +13,14 @@ import Types
 -- simpler space, _does not_ consume newline
 space :: Parser ()
 space = do
-  _ <- P.many (P.single ' ')
+  _ <- P.many (P.single ' ' <|> P.single '\t')
   return ()
 
 
 -- simpler space, _does_ consume newline
 spaceOrNL :: Parser ()
 spaceOrNL = do
-  _ <- P.many (P.single ' ' <|> P.single '\n')
+  _ <- P.many (P.single ' ' <|> P.single '\t' <|> P.single '\n')
   return ()
 
 

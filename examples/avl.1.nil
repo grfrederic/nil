@@ -1,0 +1,20 @@
+-- AVL tree keeping track of height
+avl   : (AVL0 ~H ~A) -> AVL ~A
+
+leaf  : AVL0 Z ~A
+lnode : (AVL0 (S ~H) ~A) ~A (AVL0 ~H ~A) -> AVL0 (S (S ~H)) ~A
+rnode : (AVL0 ~H ~A) ~A (AVL0 (S ~H) ~A) -> AVL0 (S (S ~H)) ~A
+mnode : (AVL0 ~H ~A) ~A (AVL0 ~H ~A) -> AVL0 (S ~H) ~A
+
+
+-- generic lists
+nil  : List ~A
+cons : ~A (List ~A) -> List ~A
+
+iter ? (List ~A) ~A
+iter (cons ~h ~t) ~h
+iter (cons ~h ~t) ~a <- iter ~t ~a
+
+
+a : A
+iter (cons (avl leaf) (cons (avl (mnode leaf a leaf)) nil)) ~t?
