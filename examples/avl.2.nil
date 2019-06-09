@@ -22,20 +22,20 @@ grow : (AVL0 (S ~H) ~A) -> MaybeBiggerAVL0 ~H ~A
 
 
 -- RIGHT ROTATION
-rotr ? (AVL0 (S (S ~H)) ~A) ~A (AVL0 ~H ~A) (MaybeBiggerAVL0 ~H ~A)
+rotr ? (AVL0 (S (S ~H)) ~A) ~A (AVL0 ~H ~A) (MaybeBiggerAVL0 (S (S ~H)) ~A)
 
 -- single rot
 rotr (lnode ~ll ~lv ~lr) ~v ~r (stay (mnode ~ll ~lv (mnode ~lr ~v ~r)))
 rotr (mnode ~ll ~lv ~lr) ~v ~r (grow (rnode ~ll ~lv (lnode ~lr ~v ~r)))
 
 -- double rot
-rotr (rnode ~ll ~lv (lnode ~lrl ~lrv ~lrr)) ~v ~r (stay (mnode (mnode ~ll ~lv ~lrl) ~lrv (lnode ~lrr ~v ~r))) 
+rotr (rnode ~ll ~lv (lnode ~lrl ~lrv ~lrr)) ~v ~r (stay (mnode (mnode ~ll ~lv ~lrl) ~lrv (rnode ~lrr ~v ~r))) 
 rotr (rnode ~ll ~lv (mnode ~lrl ~lrv ~lrr)) ~v ~r (stay (mnode (mnode ~ll ~lv ~lrl) ~lrv (mnode ~lrr ~v ~r))) 
 rotr (rnode ~ll ~lv (rnode ~lrl ~lrv ~lrr)) ~v ~r (stay (mnode (lnode ~ll ~lv ~lrl) ~lrv (mnode ~lrr ~v ~r))) 
 
 
 -- LEFT ROTATION
-rotl ? (AVL0 ~H ~A) ~A (AVL0 (S (S ~H)) ~A) (MaybeBiggerAVL0 ~H ~A)
+rotl ? (AVL0 ~H ~A) ~A (AVL0 (S (S ~H)) ~A) (MaybeBiggerAVL0 (S (S ~H)) ~A)
 
 -- single rot
 rotl ~l ~v (rnode ~rl ~rv ~rr) (stay (mnode (mnode ~l ~v ~rl) ~rv ~rr))
@@ -45,6 +45,7 @@ rotl ~l ~v (mnode ~rl ~rv ~rr) (grow (lnode (rnode ~l ~v ~rl) ~rv ~rr))
 rotl ~l ~v (lnode (rnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (lnode ~l ~v ~rll) ~rlv (mnode ~rlr ~rv ~rr))) 
 rotl ~l ~v (lnode (mnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (mnode ~l ~v ~rll) ~rlv (mnode ~rlr ~rv ~rr))) 
 rotl ~l ~v (lnode (lnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (mnode ~l ~v ~rll) ~rlv (rnode ~rlr ~rv ~rr))) 
+
 
 
 -- INSERT
@@ -75,6 +76,7 @@ insert0 ~p (rnode ~l ~v ~r) ~nt <- greater ~p ~v, insert0 ~p ~r (grow ~nr), rotl
 insert0 ~p (lnode ~l ~p ~r) (stay (lnode ~l ~p ~r))
 insert0 ~p (mnode ~l ~p ~r) (stay (mnode ~l ~p ~r))
 insert0 ~p (rnode ~l ~p ~r) (stay (rnode ~l ~p ~r))
+
 
 
 -- WRAPPED

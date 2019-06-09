@@ -5,6 +5,8 @@ import qualified Data.Map as M
 import Types
 
 
+-- unification always performs occur check!
+
 
 data Step = Substitute Substitution | Expand [(Dasein, Dasein)] | Fail
 
@@ -12,8 +14,12 @@ unificationStep :: (Dasein, Dasein) -> Step
 unificationStep (d1, d2) | d1 == d2 = Substitute mempty 
 
 -- variables
-unificationStep (DaseinV x, d) = Substitute $ Substitution $ M.fromList [(x, d)] 
-unificationStep (d, DaseinV x) = Substitute $ Substitution $ M.fromList [(x, d)] 
+unificationStep (DaseinV x, d)
+  | occurCheck x d = Substitute $ Substitution $ M.fromList [(x, d)] 
+  | otherwise      = Fail
+unificationStep (d, DaseinV x) 
+  | occurCheck x d = Substitute $ Substitution $ M.fromList [(x, d)] 
+  | otherwise      = Fail
 
 -- constructors
 unificationStep (DaseinK k ds1, DaseinK l ds2) | k == l = Expand $ zip ds1 ds2
@@ -30,3 +36,8 @@ unify (h:t) = case unificationStep h of
       f (d1, d2) = (substitute s d1, substitute s d2)
   Expand ps -> unify $ ps ++ t
   Fail -> Nothing
+
+
+occurCheck :: Variable -> Dasein -> Bool
+occurCheck v (DaseinV w) = v /= w
+occurCheck v (DaseinK _ ds) = all (occurCheck v) ds
