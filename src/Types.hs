@@ -31,7 +31,10 @@ data TypDaseinS = TypDaseinKS TypKonstruktorS [TypDaseinS]
                 | TypDaseinVS TypVariableS
                 deriving (Eq, Show)
 
-data TermS = TermS RelationS [DaseinS] deriving (Eq, Show)
+data TermS = TermRS RelationS [DaseinS]
+           | CutS
+           deriving (Eq, Show)
+
 newtype BedingungS = BedingungS [TermS] deriving (Eq, Show)
 newtype KonsequenzS = KonsequenzS (Maybe TermS) deriving (Eq, Show)
 
@@ -77,7 +80,10 @@ data TypDasein = TypDaseinK TypKonstruktor [TypDasein]
                | TypDaseinV TypVariable
                deriving (Eq, Show)
 
-data Term = Term Relation [Dasein] deriving (Eq, Show)
+data Term = TermR Relation [Dasein]
+          | Cut
+          deriving (Eq, Show)
+
 newtype Bedingung = Bedingung [Term] deriving (Eq, Show)
 newtype Konsequenz = Konsequenz (Maybe Term) deriving (Eq, Show)
 
@@ -158,8 +164,9 @@ newtype InferredTypes = InferredTypes (M.Map Variable TypDasein)
 emptyInferredTypes :: InferredTypes
 emptyInferredTypes = InferredTypes M.empty
 
-data Goal = Goal
-  { era :: Integer
-  , solution :: Substitution
-  , terms :: [Term]
-  } deriving Show
+data Goal = Goal { era :: Integer
+                 , solution :: Substitution
+                 , terms :: [Term]
+                 }
+          | Checkpoint
+          deriving Show

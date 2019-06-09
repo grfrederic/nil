@@ -21,7 +21,8 @@ runKL k = do
 
 -- new information
 addKL :: Klausel -> IS [String]
-addKL k@(Klausel (Konsequenz (Just (Term r _))) _) = do
+addKL (Klausel (Konsequenz (Just Cut)) _) = undefined
+addKL k@(Klausel (Konsequenz (Just (TermR r _))) _) = do
   s <- get
   let ke = klauselEnv s
   put $ s {klauselEnv = M.insertWith (flip (++)) r [k] ke}

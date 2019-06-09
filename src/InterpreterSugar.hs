@@ -47,7 +47,7 @@ createFrom k t ts = [Left rel, Right kls]
     kls = Klausel (Konsequenz $ Just tm) (Bedingung [])
 
     r = createRelation k
-    tm = Term r (DaseinK k vs:vs)
+    tm = TermR r (DaseinK k vs:vs)
 
     createRelation :: Konstruktor -> Relation
     createRelation (Konstruktor n) =
@@ -76,7 +76,7 @@ createGets k t ttds = map Left rtds ++ map Right ks
       simpleKlausel tm = Klausel (Konsequenz $ Just tm) (Bedingung [])
 
       unpacker :: (Relation, Dasein) -> Term
-      unpacker (r, d) = Term r [constr, d]
+      unpacker (r, d) = TermR r [constr, d]
 
       ks = map (simpleKlausel . unpacker) $ zip rels vs 
 
@@ -112,10 +112,12 @@ desugarKlausel (KlauselS (KonsequenzS kmt) (BedingungS bts)) = do
 
 
 desugarTerm :: TermS -> IS Term
-desugarTerm (TermS r ds) = do
+desugarTerm CutS = return Cut
+desugarTerm (TermRS r ds) = do
   dr <- desugarRelation r
   dds <- mapM desugarDasein ds
-  return $ Term dr dds
+  return $ TermR dr dds
+
 
 
 desugarRelation :: RelationS -> IS Relation

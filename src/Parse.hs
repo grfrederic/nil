@@ -169,11 +169,18 @@ typDaseinParserB =  fmap TypDaseinVS typVariableParser
 
 
 termParser :: Parser TermS
-termParser = do
-  r <- relationParser
-  _ <- space
-  ds <- daseinParserB `P.sepEndBy1` space
-  return $ TermS r ds
+termParser =  cut
+          <|> normal
+  where
+    cut = do
+      _ <- P.single '!'
+      return CutS
+
+    normal = do
+      r <- relationParser
+      _ <- space
+      ds <- daseinParserB `P.sepEndBy1` space
+      return $ TermRS r ds
 
 
 bedingungParser :: Parser BedingungS

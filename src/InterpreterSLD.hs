@@ -28,11 +28,17 @@ runSLD ts = do
       startVars = ts >>= extractVarsT
 
       extractVarsT :: Term -> [Variable]
-      extractVarsT (Term _ ds) = ds >>= extractVarsD
+      extractVarsT Cut = []
+      extractVarsT (TermR _ ds) = ds >>= extractVarsD
 
       extractVarsD :: Dasein -> [Variable]
       extractVarsD (DaseinV v) = [v]
       extractVarsD (DaseinK _ ds) = ds >>= extractVarsD
+
+
+data StepResult = NewGoals [Goal]
+                | Found Substitution
+                | StartCut Goal
 
 
 getSolutions :: [Goal] -> IS [Substitution]
@@ -40,17 +46,34 @@ getSolutions [] = return []
 getSolutions (g:t) = do
   step <- runStep g
   case step of
-    Left n -> getSolutions $ n ++ t
-    Right s -> (s:) <$> getSolutions t
+    NewGoals n -> getSolutions $ n ++ t
+    Found s -> (s:) <$> getSolutions t
+    StartCut ng -> getSolutions $ ng:cutTillCheckPoint t
 
 
-runStep :: Goal -> IS (Either [Goal] Substitution)
-runStep Goal{terms = [], solution = sol} = return $ Right sol
-runStep goal@Goal{era = e, terms = Term r ds:t} = do
+cutTillCheckPoint :: [Goal] -> [Goal]
+cutTillCheckPoint [] = []
+cutTillCheckPoint (Checkpoint:t) = Checkpoint:t
+cutTillCheckPoint (_:t) = cutTillCheckPoint t
+
+runStep :: Goal -> IS StepResult
+
+-- returning from klausel search
+runStep Checkpoint = return $ NewGoals []
+
+-- found solution
+runStep Goal{terms = [], solution = sol} = return $ Found sol
+
+-- new term
+runStep goal@Goal{era = e, terms = TermR r ds:t} = do
   ke <- klauselEnv <$> get
   let ks = concat $ maybeToList $ M.lookup r ke
-  let tes = mapMaybe (tryUnify e (Term r ds)) ks
-  return $ Left $ map updateGoal tes <*> [goal {terms = t}]
+  let tes = mapMaybe (tryUnify e (TermR r ds)) ks
+  return $ NewGoals $ map updateGoal tes <*> [goal {terms = t}]
+
+-- cut
+runStep goal@Goal{era = e, terms = Cut:t} =
+  return $ StartCut $ goal {era = e+1, terms = t}
 
 
 tryUnify :: Integer -> Term -> Klausel -> Maybe (Substitution, [Term])
@@ -60,11 +83,12 @@ tryUnify e t1 (Klausel (Konsequenz (Just t2)) (Bedingung ts)) =
     Just sub -> Just (sub, map termMangle ts)
       where
         termMangle :: Term -> Term
-        termMangle (Term r ds) = Term r (map (eraMangle e) ds)
+        termMangle Cut = Cut
+        termMangle (TermR r ds) = TermR r (map (eraMangle e) ds)
     Nothing -> Nothing
     where
-      (Term _ ds1) = t1
-      (Term _ ds2) = t2
+      (TermR _ ds1) = t1
+      (TermR _ ds2) = t2
       ds3 = map (eraMangle e) ds2
 
 
@@ -75,7 +99,8 @@ updateGoal (s, ts) goal = Goal {era = ne, solution = ns, terms = nt}
     ns = mappend (solution goal) s
     nt = map update $ mappend ts (terms goal)
     update :: Term -> Term
-    update (Term r ds) = Term r (map (substitute s) ds)
+    update (TermR r ds) = TermR r (map (substitute s) ds)
+    update Cut = Cut
 
 
 eraMangle :: Integer -> Dasein -> Dasein
