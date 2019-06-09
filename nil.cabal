@@ -13,6 +13,7 @@ cabal-version:       >=1.10
 
 executable nil
   main-is:             Main.hs
+  ghc-options:         -Wall
   other-modules:       Types,
                        Parse,
                        Unify,
@@ -23,7 +24,8 @@ executable nil
                        InterpreterCheckTypes,
                        InterpreterCheckDefined,
                        InterpreterKlausel,
-                       InterpreterSLD
+                       InterpreterSLD,
+                       InterpreterNil
   build-depends:       base >=4.9 && <4.10,
                        transformers,
                        megaparsec,

@@ -5,7 +5,6 @@ import Control.Monad.State.Lazy (get, put)
 
 import Types
 import InterpreterCheckDefined (checkDefinedKL)
-import InterpreterSugar (desugarKL)
 import InterpreterCheckTypes (checkTypesKL)
 import InterpreterSLD (runSLD)
 
@@ -14,11 +13,10 @@ import InterpreterSLD (runSLD)
 runKL :: Klausel -> IS [String]
 runKL k = do
   checkDefinedKL k
-  dk <- desugarKL k
-  checkTypesKL dk
-  case dk of
+  checkTypesKL k
+  case k of
     Klausel (Konsequenz Nothing) (Bedingung ts) -> runSLD ts
-    _ -> addKL dk
+    _ -> addKL k
 
 
 -- new information

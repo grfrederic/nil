@@ -7,14 +7,14 @@ import Data.Maybe (mapMaybe, maybeToList)
 import Types
 import Unify
 import PrettyShow
-import InterpreterSugar (resugarDasein)
+import InterpreterSugar (resugarSubstitution)
 
 
 runSLD :: [Term] -> IS [String]
 runSLD ts = do
   ss <- getSolutions [startGoal]
   let fs = map filterForStart ss
-  rs <- mapM resugarSub fs
+  rs <- mapM resugarSubstitution fs
   return $ map psS rs
     where
       startGoal = Goal {era = 0, solution = mempty, terms = ts}
@@ -33,14 +33,6 @@ runSLD ts = do
       extractVarsD :: Dasein -> [Variable]
       extractVarsD (DaseinV v) = [v]
       extractVarsD (DaseinK _ ds) = ds >>= extractVarsD
-
-      resugarSub :: Substitution -> IS Substitution
-      resugarSub (Substitution sm) = do
-        let sl = M.toList sm
-        let ks = map fst sl
-        let vs = map snd sl
-        rvs <- mapM resugarDasein vs
-        return $ Substitution $ M.fromList $ zip ks rvs
 
 
 getSolutions :: [Goal] -> IS [Substitution]
@@ -62,6 +54,7 @@ runStep goal@Goal{era = e, terms = Term r ds:t} = do
 
 
 tryUnify :: Integer -> Term -> Klausel -> Maybe (Substitution, [Term])
+tryUnify _ _ (Klausel (Konsequenz Nothing) _) = undefined
 tryUnify e t1 (Klausel (Konsequenz (Just t2)) (Bedingung ts)) =
   case unify $ zip ds1 ds3 of
     Just sub -> Just (sub, map termMangle ts)

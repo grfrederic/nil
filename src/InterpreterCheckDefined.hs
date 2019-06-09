@@ -1,7 +1,6 @@
 module InterpreterCheckDefined where
 
 import Data.Maybe (catMaybes)
-import Data.List (sort)
 
 import Types
 import PrettyShow
@@ -31,10 +30,3 @@ checkDefinedDasein (DaseinK k ds) = do
   if length ds == length dts
      then mapM_ checkDefinedDasein ds
      else throw $ WrongNumberOfArgs $ psK k
-
-checkDefinedDasein (DaseinR k tds) = do
-  ts <- getRecordDecl k
-  if sort ts == sort (map fst tds)
-     then mapM_ (checkDefinedDasein . snd) tds
-     else throw $ WrongRecordTags $ psK k
-

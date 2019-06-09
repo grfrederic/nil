@@ -8,6 +8,55 @@ import Data.Void
 import Data.Text (Text)
 
 
+-- PART I : SUGARED TYPES
+
+-- basic types
+newtype KonstruktorS = KonstruktorS String deriving (Eq, Show, Ord)
+newtype VariableS = VariableS String deriving (Eq, Show, Ord)
+newtype TagS = TagS String deriving (Eq, Show, Ord)
+
+newtype TypKonstruktorS = TypKonstruktorS String deriving (Eq, Show, Ord)
+newtype TypVariableS = TypVariableS String deriving (Eq, Show, Ord)
+
+newtype RelationS = RelationS String deriving (Eq, Show, Ord)
+
+
+-- complex types
+data DaseinS = DaseinKS KonstruktorS [DaseinS]
+             | DaseinVS VariableS
+             | DaseinRS KonstruktorS [(TagS, DaseinS)]
+             deriving (Eq, Show)
+
+data TypDaseinS = TypDaseinKS TypKonstruktorS [TypDaseinS]
+                | TypDaseinVS TypVariableS
+                deriving (Eq, Show)
+
+data TermS = TermS RelationS [DaseinS] deriving (Eq, Show)
+newtype BedingungS = BedingungS [TermS] deriving (Eq, Show)
+newtype KonsequenzS = KonsequenzS (Maybe TermS) deriving (Eq, Show)
+
+
+-- program line
+data TypDefinitionS = KonstruktorTDS KonstruktorS [TypDaseinS] TypDaseinS
+                    | RecordTDS KonstruktorS [(TagS, TypDaseinS)] TypDaseinS
+                    | RelationTDS RelationS [TypDaseinS]
+                    deriving (Eq, Show)
+
+data KlauselS = KlauselS KonsequenzS BedingungS deriving (Eq, Show)
+
+
+-- program
+type ProgrammzeileS = Either TypDefinitionS KlauselS
+newtype ProgrammS = ProgrammS [ProgrammzeileS] deriving (Eq, Show)
+
+
+-- unification and SLD resolution
+newtype SubstitutionS = SubstitutionS (M.Map VariableS DaseinS)
+                        deriving (Eq, Show)
+
+
+-- PART II : CORE TYPES
+
 -- basic types
 newtype Konstruktor = Konstruktor String deriving (Eq, Show, Ord)
 newtype Variable = Variable String deriving (Eq, Show, Ord)
@@ -22,7 +71,6 @@ newtype Relation = Relation String deriving (Eq, Show, Ord)
 -- complex types
 data Dasein = DaseinK Konstruktor [Dasein]
             | DaseinV Variable
-            | DaseinR Konstruktor [(Tag, Dasein)]
             deriving (Eq, Show)
 
 data TypDasein = TypDaseinK TypKonstruktor [TypDasein]
@@ -44,15 +92,36 @@ data Klausel = Klausel Konsequenz Bedingung deriving (Eq, Show)
 
 
 -- program
-newtype Program = Program [Either TypDefinition Klausel]
-                  deriving (Eq, Show)
+type Programmzeile = Either TypDefinition Klausel
+newtype Programm = Programm [Programmzeile] deriving (Eq, Show)
 
 
--- parser
+-- unification and SLD resolution
+newtype Substitution = Substitution (M.Map Variable Dasein)
+                       deriving (Eq, Show)
+
+substitute :: Substitution -> Dasein -> Dasein
+substitute (Substitution m) (DaseinV v) | v `M.member` m = m M.! v
+                                        | otherwise      = DaseinV v
+substitute s (DaseinK k ds) = DaseinK k (map (substitute s) ds)
+
+
+instance Monoid Substitution where
+  mempty = Substitution M.empty
+  mappend (Substitution m1) (Substitution m2) = Substitution $ M.union cm rm
+    where
+      cm = M.map (substitute $ Substitution m2) m1
+      rm = M.difference m2 m1
+
+
+-- PART III : INTERPRETER, UNIFICATION AND RESOLUTION
+
+
+-- parser will return the sugarded, *S, types
 type Parser = P.Parsec Void Text
 
 
--- interpreter
+-- but the interpreter only works with core, non *S, types
 data EnvState = EnvState
   { konstruktorEnv :: M.Map Konstruktor (TypDasein, [TypDasein])
   , recordEnv :: M.Map Konstruktor [Tag]
@@ -89,15 +158,8 @@ newtype InferredTypes = InferredTypes (M.Map Variable TypDasein)
 emptyInferredTypes :: InferredTypes
 emptyInferredTypes = InferredTypes M.empty
 
-
--- unification and SLD resolution
-newtype Substitution = Substitution (M.Map Variable Dasein)
-                       deriving (Eq, Show)
-
-
 data Goal = Goal
   { era :: Integer
   , solution :: Substitution
   , terms :: [Term]
   } deriving Show
-

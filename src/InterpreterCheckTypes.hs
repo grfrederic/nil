@@ -1,7 +1,6 @@
 module InterpreterCheckTypes where
 
 import Control.Monad.State.Lazy as S 
-import qualified Data.Map as M
 import Data.Maybe (catMaybes)
 import Data.List (intercalate)
 import Data.Char (toUpper)
@@ -38,7 +37,7 @@ checkTypesTerm mangleID (Term r ds) = do
 
 -- returnes given Daseins inferred TypDasein and its subproblem
 checkTypesDasein :: [Int] -> Dasein -> IS (Dasein, [(Dasein, Dasein)])
-checkTypesDasein mangleID (DaseinV v) = return (DaseinV $ varToVarType v, [])
+checkTypesDasein _ (DaseinV v) = return (DaseinV $ varToVarType v, [])
 checkTypesDasein mangleID (DaseinK k ds) = do
   (kt, dts) <- getKonstruktorDecl k
   if length ds == length dts

@@ -31,53 +31,53 @@ comment =  L.skipLineComment (T.pack "--")
 
 
 -- basic types
-konstruktorParser :: Parser Konstruktor
+konstruktorParser :: Parser KonstruktorS
 konstruktorParser = do
   s0 <- C.lowerChar
   rs <- P.many C.alphaNumChar
-  return . Konstruktor $ s0:rs
+  return . KonstruktorS $ s0:rs
 
 
-variableParser :: Parser Variable
+variableParser :: Parser VariableS
 variableParser = do
   s0 <- P.single '~'
   s1 <- C.lowerChar
   rs <- P.many C.alphaNumChar
-  return . Variable $ s0:s1:rs
+  return . VariableS $ s0:s1:rs
 
 
-tagParser :: Parser Tag
+tagParser :: Parser TagS
 tagParser = do
   s0 <- C.lowerChar
   rs <- P.many C.alphaNumChar
-  return . Tag $ s0:rs
+  return . TagS $ s0:rs
 
 
-typKonstruktorParser :: Parser TypKonstruktor
+typKonstruktorParser :: Parser TypKonstruktorS
 typKonstruktorParser = do
   s0 <- C.upperChar
   rs <- P.many C.alphaNumChar
-  return . TypKonstruktor $ s0:rs
+  return . TypKonstruktorS $ s0:rs
 
 
-typVariableParser :: Parser TypVariable
+typVariableParser :: Parser TypVariableS
 typVariableParser = do
   s0 <- P.single '~'
   s1 <- C.upperChar
   rs <- P.many C.alphaNumChar
-  return . TypVariable $ s0:s1:rs
+  return . TypVariableS $ s0:s1:rs
 
 
-relationParser :: Parser Relation
+relationParser :: Parser RelationS
 relationParser = do
   s0 <- C.lowerChar
   rs <- P.many C.alphaNumChar
-  return . Relation $ s0:rs
+  return . RelationS $ s0:rs
 
 
 -- complex types
-daseinParserA :: Parser Dasein
-daseinParserA =  fmap DaseinV variableParser
+daseinParserA :: Parser DaseinS
+daseinParserA =  fmap DaseinVS variableParser
              <|> bracketed
              <|> P.try record
              <|> komplex
@@ -91,14 +91,14 @@ daseinParserA =  fmap DaseinV variableParser
       k <- konstruktorParser
       _ <- space
       ds <- daseinParserB `P.sepEndBy` space
-      return $ DaseinK k ds
+      return $ DaseinKS k ds
 
     record = do
       k <- konstruktorParser
       _ <- space >> P.single '{' >> space
       tds <- tagDasein `P.sepBy` (space >> P.single ',' >> space)
       _ <- space >> P.single '}'
-      return $ DaseinR k tds 
+      return $ DaseinRS k tds 
 
     tagDasein = do
       t <- tagParser
@@ -107,8 +107,8 @@ daseinParserA =  fmap DaseinV variableParser
       return (t, d)
 
 
-daseinParserB :: Parser Dasein
-daseinParserB =  fmap DaseinV variableParser
+daseinParserB :: Parser DaseinS
+daseinParserB =  fmap DaseinVS variableParser
              <|> bracketed
              <|> P.try record
              <|> simple
@@ -120,14 +120,14 @@ daseinParserB =  fmap DaseinV variableParser
 
     simple = do
       k <- konstruktorParser
-      return $ DaseinK k []
+      return $ DaseinKS k []
 
     record = do
       k <- konstruktorParser
       _ <- space >> P.single '{' >> space
       tds <- tagDasein `P.sepBy` (space >> P.single ',' >> space)
       _ <- space >> P.single '}'
-      return $ DaseinR k tds 
+      return $ DaseinRS k tds 
 
     tagDasein = do
       t <- tagParser
@@ -136,8 +136,8 @@ daseinParserB =  fmap DaseinV variableParser
       return (t, d)
 
 
-typDaseinParserA :: Parser TypDasein
-typDaseinParserA =  fmap TypDaseinV typVariableParser
+typDaseinParserA :: Parser TypDaseinS
+typDaseinParserA =  fmap TypDaseinVS typVariableParser
                 <|> bracketed
                 <|> komplex
   where
@@ -150,11 +150,11 @@ typDaseinParserA =  fmap TypDaseinV typVariableParser
       t <- typKonstruktorParser
       _ <- space
       ts <- typDaseinParserB `P.sepEndBy` space
-      return $ TypDaseinK t ts
+      return $ TypDaseinKS t ts
 
 
-typDaseinParserB :: Parser TypDasein
-typDaseinParserB =  fmap TypDaseinV typVariableParser
+typDaseinParserB :: Parser TypDaseinS
+typDaseinParserB =  fmap TypDaseinVS typVariableParser
                 <|> bracketed
                 <|> simple
   where
@@ -165,35 +165,35 @@ typDaseinParserB =  fmap TypDaseinV typVariableParser
 
     simple = do
       t <- typKonstruktorParser
-      return $ TypDaseinK t []
+      return $ TypDaseinKS t []
 
 
-termParser :: Parser Term
+termParser :: Parser TermS
 termParser = do
   r <- relationParser
   _ <- space
   ds <- daseinParserB `P.sepEndBy1` space
-  return $ Term r ds
+  return $ TermS r ds
 
 
-bedingungParser :: Parser Bedingung
-bedingungParser = fmap Bedingung $ termParser `P.sepBy` comma
+bedingungParser :: Parser BedingungS
+bedingungParser = fmap BedingungS $ termParser `P.sepBy` comma
   where
     comma = space >> P.single ',' >> spaceOrNL
 
 
-konsequenzParserJ :: Parser Konsequenz
-konsequenzParserJ =  fmap (Konsequenz . Just) termParser
+konsequenzParserJ :: Parser KonsequenzS
+konsequenzParserJ =  fmap (KonsequenzS . Just) termParser
 
-konsequenzParserN :: Parser Konsequenz
-konsequenzParserN =  return $ Konsequenz Nothing
+konsequenzParserN :: Parser KonsequenzS
+konsequenzParserN =  return $ KonsequenzS Nothing
 
-konsequenzParser :: Parser Konsequenz
+konsequenzParser :: Parser KonsequenzS
 konsequenzParser =  P.try konsequenzParserJ <|> konsequenzParserN
 
 
 -- program line
-konstruktorTDParser :: Parser TypDefinition
+konstruktorTDParser :: Parser TypDefinitionS
 konstruktorTDParser =  P.try normal -- a : A B C -> D
                    <|> short        -- a : A
   where
@@ -203,23 +203,23 @@ konstruktorTDParser =  P.try normal -- a : A B C -> D
       ts <- typDaseinParserB `P.sepEndBy` space
       _ <- space >> C.string (T.pack "->") >> space
       rt <- typDaseinParserA
-      return $ KonstruktorTD k ts rt
+      return $ KonstruktorTDS k ts rt
 
     short = do
       k <- konstruktorParser
       _ <- space >> P.single ':' >> space
       rt <- typDaseinParserA
-      return $ KonstruktorTD k [] rt
+      return $ KonstruktorTDS k [] rt
 
 
-recordTDParser :: Parser TypDefinition
+recordTDParser :: Parser TypDefinitionS
 recordTDParser = do -- book : {id: Int, author: String} -> Book
   k <- konstruktorParser
   _ <- space >> P.single ':' >> space >> P.single '{'
   ttds <- tagTypDasein `P.sepBy` (space >> P.single ',' >> space)
   _ <- space >> P.single '}' >> space >> C.string (T.pack "->") >> space
   rt <- typDaseinParserA
-  return $ RecordTD k ttds rt
+  return $ RecordTDS k ttds rt
     where
       tagTypDasein = do
         t <- tagParser
@@ -228,21 +228,21 @@ recordTDParser = do -- book : {id: Int, author: String} -> Book
         return (t, td)
 
 
-relationTDParser :: Parser TypDefinition
+relationTDParser :: Parser TypDefinitionS
 relationTDParser = do
   r <- relationParser
   _ <- space >> P.single '?' >> space
   ts <- typDaseinParserB `P.sepEndBy1` space
-  return $ RelationTD r ts
+  return $ RelationTDS r ts
 
 
-typDefinitionParser :: Parser TypDefinition
+typDefinitionParser :: Parser TypDefinitionS
 typDefinitionParser =  P.try konstruktorTDParser
                    <|> P.try recordTDParser
                    <|> relationTDParser
 
 
-klauselParser :: Parser Klausel
+klauselParser :: Parser KlauselS
 klauselParser =  P.try full    -- k1 <- b1, ..., bn
              <|> P.try shortQ  -- b1, ..., bn?
              <|> P.try shortS  -- k1
@@ -251,21 +251,21 @@ klauselParser =  P.try full    -- k1 <- b1, ..., bn
       k <- konsequenzParser
       _ <- space >> C.string (T.pack "<-") >> space
       b <- bedingungParser
-      return $ Klausel k b
+      return $ KlauselS k b
 
     shortS = do
       k <- konsequenzParserJ
-      return $ Klausel k (Bedingung [])
+      return $ KlauselS k (BedingungS [])
 
     shortQ = do
       b <- bedingungParser
       _ <- space >> P.single '?' >> space
-      return $ Klausel (Konsequenz Nothing) b
+      return $ KlauselS (KonsequenzS Nothing) b
 
 
 -- program
-programLineParser :: Parser (Maybe (Either TypDefinition Klausel))
-programLineParser =  do
+programmzeileParser :: Parser (Maybe (Either TypDefinitionS KlauselS))
+programmzeileParser =  do
   _ <- space
   l <- fmap (Just . Left) (P.try typDefinitionParser)
    <|> fmap (Just . Right) (P.try klauselParser)
@@ -275,5 +275,5 @@ programLineParser =  do
   return l
 
 
-programParser :: Parser Program
-programParser = fmap (Program . catMaybes) $ P.many programLineParser <* P.eof
+programmParser :: Parser ProgrammS
+programmParser = fmap (ProgrammS . catMaybes) $ P.many programmzeileParser <* P.eof
