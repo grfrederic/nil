@@ -1,0 +1,16 @@
+-- PEANO ARITHMETIC
+z : P
+s : P -> P
+
+greater ? P P
+greater (s ~x) z
+greater (s ~x) (s ~y) <- greater ~x ~y
+
+-- this is bad!!!
+max ? P P P
+max ~x ~y ~x <- greater ~x ~y, !
+max ~x ~y ~y
+
+max (s z) z ~z?
+max (s z) (s z) ~z?
+max (s z) (s (s z)) ~z?
