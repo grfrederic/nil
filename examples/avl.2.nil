@@ -22,29 +22,29 @@ grow : (AVL0 (S ~H) ~A) -> MaybeBiggerAVL0 ~H ~A
 
 
 -- RIGHT ROTATION
-rotr ? ~A (AVL0 (S (S ~H)) ~A) (AVL0 ~H ~A) (MaybeBiggerAVL0 ~H ~A)
+rotr ? (AVL0 (S (S ~H)) ~A) ~A (AVL0 ~H ~A) (MaybeBiggerAVL0 ~H ~A)
 
 -- single rot
-rotr ~v (lnode ~ll ~lv ~lr) ~r (stay (mnode ~ll ~lv (mnode ~lr ~v ~r)))
-rotr ~v (mnode ~ll ~lv ~lr) ~r (grow (rnode ~ll ~lv (lnode ~lr ~v ~r)))
+rotr (lnode ~ll ~lv ~lr) ~v ~r (stay (mnode ~ll ~lv (mnode ~lr ~v ~r)))
+rotr (mnode ~ll ~lv ~lr) ~v ~r (grow (rnode ~ll ~lv (lnode ~lr ~v ~r)))
 
 -- double rot
-rotr ~v (rnode ~ll ~lv (lnode ~lrl ~lrv ~lrr)) ~r (stay (mnode (mnode ~ll ~lv ~lrl) ~lrv (rnode ~lrr ~v ~r))) 
-rotr ~v (rnode ~ll ~lv (mnode ~lrl ~lrv ~lrr)) ~r (stay (mnode (mnode ~ll ~lv ~lrl) ~lrv (mnode ~lrr ~v ~r))) 
-rotr ~v (rnode ~ll ~lv (rnode ~lrl ~lrv ~lrr)) ~r (stay (mnode (lnode ~ll ~lv ~lrl) ~lrv (mnode ~lrr ~v ~r))) 
+rotr (rnode ~ll ~lv (lnode ~lrl ~lrv ~lrr)) ~v ~r (stay (mnode (mnode ~ll ~lv ~lrl) ~lrv (lnode ~lrr ~v ~r))) 
+rotr (rnode ~ll ~lv (mnode ~lrl ~lrv ~lrr)) ~v ~r (stay (mnode (mnode ~ll ~lv ~lrl) ~lrv (mnode ~lrr ~v ~r))) 
+rotr (rnode ~ll ~lv (rnode ~lrl ~lrv ~lrr)) ~v ~r (stay (mnode (lnode ~ll ~lv ~lrl) ~lrv (mnode ~lrr ~v ~r))) 
 
 
 -- LEFT ROTATION
-rotl ? ~A (AVL0 ~H ~A) (AVL0 (S (S ~H)) ~A) (MaybeBiggerAVL0 ~H ~A)
+rotl ? (AVL0 ~H ~A) ~A (AVL0 (S (S ~H)) ~A) (MaybeBiggerAVL0 ~H ~A)
 
 -- single rot
-rotl ~v ~l (rnode ~rl ~rv ~rr) (stay (mnode (mnode ~l ~v ~rl) ~rv ~rr))
-rotl ~v ~l (mnode ~rl ~rv ~rr) (grow (lnode (rnode ~l ~v ~rl) ~rv ~rr))
+rotl ~l ~v (rnode ~rl ~rv ~rr) (stay (mnode (mnode ~l ~v ~rl) ~rv ~rr))
+rotl ~l ~v (mnode ~rl ~rv ~rr) (grow (lnode (rnode ~l ~v ~rl) ~rv ~rr))
 
 -- double rot
-rotl ~v ~l (lnode (rnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (lnode ~l ~v ~rll) ~rlv (mnode ~rlr ~rv ~rr))) 
-rotl ~v ~l (lnode (mnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (mnode ~l ~v ~rll) ~rlv (mnode ~rlr ~rv ~rr))) 
-rotl ~v ~l (lnode (lnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (mnode ~l ~v ~rll) ~rlv (rnode ~rlr ~rv ~rr))) 
+rotl ~l ~v (lnode (rnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (lnode ~l ~v ~rll) ~rlv (mnode ~rlr ~rv ~rr))) 
+rotl ~l ~v (lnode (mnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (mnode ~l ~v ~rll) ~rlv (mnode ~rlr ~rv ~rr))) 
+rotl ~l ~v (lnode (lnode ~rll ~rlv ~rlr) ~rv ~rr) (stay (mnode (mnode ~l ~v ~rll) ~rlv (rnode ~rlr ~rv ~rr))) 
 
 
 -- INSERT
@@ -58,7 +58,7 @@ insert0 ~p (lnode ~l ~v ~r) (stay (lnode ~nl ~v ~r)) <- greater ~v ~p, insert0 ~
 insert0 ~p (mnode ~l ~v ~r) (stay (mnode ~nl ~v ~r)) <- greater ~v ~p, insert0 ~p ~l (stay ~nl)
 insert0 ~p (rnode ~l ~v ~r) (stay (rnode ~nl ~v ~r)) <- greater ~v ~p, insert0 ~p ~l (stay ~nl)
 
-insert0 ~p (lnode ~l ~v ~r) ~nt <- greater ~v ~p, insert0 ~p ~l (grow ~nl), rotr ~v ~nl ~r ~nt
+insert0 ~p (lnode ~l ~v ~r) ~nt <- greater ~v ~p, insert0 ~p ~l (grow ~nl), rotr ~nl ~v ~r ~nt
 insert0 ~p (mnode ~l ~v ~r) (grow (lnode ~nl ~v ~r)) <- greater ~v ~p, insert0 ~p ~l (grow ~nl)
 insert0 ~p (rnode ~l ~v ~r) (stay (mnode ~nl ~v ~r)) <- greater ~v ~p, insert0 ~p ~l (grow ~nl)
 
@@ -69,7 +69,7 @@ insert0 ~p (rnode ~l ~v ~r) (stay (rnode ~l ~v ~nr)) <- greater ~p ~v, insert0 ~
 
 insert0 ~p (lnode ~l ~v ~r) (stay (mnode ~l ~v ~nr)) <- greater ~p ~v, insert0 ~p ~r (grow ~nr)
 insert0 ~p (mnode ~l ~v ~r) (grow (rnode ~l ~v ~nr)) <- greater ~p ~v, insert0 ~p ~r (grow ~nr)
-insert0 ~p (rnode ~l ~v ~r) ~nt <- greater ~p ~v, insert0 ~p ~r (grow ~nr), rotl ~v ~l ~nr ~nt
+insert0 ~p (rnode ~l ~v ~r) ~nt <- greater ~p ~v, insert0 ~p ~r (grow ~nr), rotl ~l ~v ~nr ~nt
 
 -- eq
 insert0 ~p (lnode ~l ~p ~r) (stay (lnode ~l ~p ~r))
@@ -77,11 +77,11 @@ insert0 ~p (mnode ~l ~p ~r) (stay (mnode ~l ~p ~r))
 insert0 ~p (rnode ~l ~p ~r) (stay (rnode ~l ~p ~r))
 
 
--- wrapped
+-- WRAPPED
 insert ? P (AVL P) (AVL P)
 insert ~p (avl ~t) (avl ~nt) <- insert0 ~p ~t (stay ~nt)
 insert ~p (avl ~t) (avl ~nt) <- insert0 ~p ~t (grow ~nt)
 
 
--- example
+-- EXAMPLE
 insert z (avl leaf) ~t1, insert (s z) ~t1 ~t2, insert (s (s z)) ~t2 ~t3?
