@@ -1,0 +1,35 @@
+z : P
+s : P -> P
+
+add ? P P P
+add z ~y ~y
+add (s ~x) ~y (s ~z) <- add ~x ~y ~z
+
+fib ? P P
+fib z z
+fib (s z) (s z)
+fib (s (s ~n)) ~f <- fib (s ~n) ~x,
+                     fib ~n ~y,
+                     add ~x ~y ~f
+
+-- similar, but avoid peano arithmetic
+fibFake ? P P
+fibFake z z
+fibFake (s z) (s z)
+fibFake (s (s ~n)) ~f <- fibFake (s ~n) ~x,
+                         fibFake ~n ~f
+
+
+--fib z ~f?
+--fib (s z) ~f?
+--fib (s (s z)) ~f?
+--fib (s (s (s z))) ~f?
+
+-- fib 15
+--fib (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s z))))))))))))))) ~f?  
+
+-- fibFake 15
+--fibFake (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s z))))))))))))))) ~f?  
+
+-- fibFake 19
+--fibFake (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s (s z))))))))))))))))))) ~f?  
