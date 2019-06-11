@@ -1,0 +1,19 @@
+cons : ~A (List ~A) -> List ~A
+nil : List ~A
+
+member ? ~A (List ~A)
+member ~h (cons ~h ~t)
+member ~h (cons ~g ~t) <- member ~h ~t
+
+fail ? ~I
+nmember ? ~A (List ~A)
+nmember ~x ~l <- member ~x ~l, !, fail ~i 
+nmember ~x ~l
+
+rob : Human
+bob : Human
+gob : Human
+
+--nmember gob (cons bob (cons rob (cons bob nil)))?
+--nmember ~x (cons bob (cons rob (cons bob nil)))?
+nmember ~x nil?
