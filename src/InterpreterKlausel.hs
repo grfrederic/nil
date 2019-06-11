@@ -21,7 +21,7 @@ runKL k = do
 
 -- new information
 addKL :: Klausel -> IS [String]
-addKL (Klausel (Konsequenz (Just Cut)) _) = undefined
+addKL (Klausel (Konsequenz (Just (Cut _))) _) = undefined
 addKL k@(Klausel (Konsequenz (Just (TermR r _))) _) = do
   s <- get
   let ke = klauselEnv s

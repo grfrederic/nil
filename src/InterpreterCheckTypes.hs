@@ -23,7 +23,7 @@ checkTypesKL (Klausel (Konsequenz kmt) (Bedingung bts)) = do
 
 
 checkTypesTerm :: [Int] -> Term -> IS [(Dasein, Dasein)]
-checkTypesTerm _ Cut = return []
+checkTypesTerm _ (Cut _) = return []
 checkTypesTerm mangleID (TermR r ds) = do
   dts <- getRelationDecl r
   if length ds == length dts

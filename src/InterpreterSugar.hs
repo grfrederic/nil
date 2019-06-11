@@ -112,7 +112,7 @@ desugarKlausel (KlauselS (KonsequenzS kmt) (BedingungS bts)) = do
 
 
 desugarTerm :: TermS -> IS Term
-desugarTerm CutS = return Cut
+desugarTerm CutS = return $ Cut Nothing
 desugarTerm (TermRS r ds) = do
   dr <- desugarRelation r
   dds <- mapM desugarDasein ds

@@ -81,7 +81,7 @@ data TypDasein = TypDaseinK TypKonstruktor [TypDasein]
                deriving (Eq, Show)
 
 data Term = TermR Relation [Dasein]
-          | Cut
+          | Cut (Maybe Integer)
           deriving (Eq, Show)
 
 newtype Bedingung = Bedingung [Term] deriving (Eq, Show)
@@ -168,5 +168,5 @@ data Goal = Goal { era :: Integer
                  , solution :: Substitution
                  , terms :: [Term]
                  }
-          | Checkpoint
+          | Checkpoint Integer
           deriving Show

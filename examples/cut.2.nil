@@ -1,0 +1,15 @@
+t ? T
+a : T
+b : T
+c : T
+
+t a
+t b
+t c
+
+p ? T
+p ~x <- t ~x
+p ~x <- t ~x, !
+p ~x <- t ~x
+
+p ~x?

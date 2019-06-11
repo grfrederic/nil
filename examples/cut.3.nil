@@ -1,0 +1,17 @@
+a : T
+
+fail ? T
+
+k1 ? T
+k2 ? T
+k3 ? T
+
+k1 ~x <- k2 ~x
+k1 a
+
+k2 ~x <- k3 ~x
+
+k3 ~x <- !, fail ~x
+k3 ~x
+
+k1 ~x?

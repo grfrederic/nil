@@ -15,7 +15,7 @@ checkDefinedKL (Klausel (Konsequenz kmt) (Bedingung bts)) = do
 
 
 checkDefinedTerm :: Term -> IS ()
-checkDefinedTerm Cut = return ()
+checkDefinedTerm (Cut _) = return ()
 checkDefinedTerm (TermR r ds) = do
   dts <- getRelationDecl r
   if length ds == length dts
